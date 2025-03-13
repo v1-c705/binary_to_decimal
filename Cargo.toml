@@ -1,0 +1,9 @@
+[package]
+name = "decimal-binar"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+color = "0.2.3"
+colored = "3.0.0"
+inquire = "0.7.5"
