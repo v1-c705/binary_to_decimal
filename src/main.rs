@@ -1,20 +1,20 @@
 use inquire::{ui::{Color, RenderConfig, StyleSheet, Styled}, Select, Text};
 use colored::*;
 
-fn binary_to_decimal(binary: &str) -> u32 {
+fn binary_to_decimal(binary: &str) -> u128 {
     let mut decimal_value = 0;
     let mut power = 0;
 
     for digit in binary.chars().rev() {
-        let bit = digit.to_digit(2).expect("Invalid binary digit");
-        decimal_value += bit * 2u32.pow(power);
+        let bit = digit.to_digit(2).expect("Invalid binary digit") as u128;
+        decimal_value += bit * 2u128.pow(power);
         power += 1;
     }
 
     decimal_value
 }
 
-fn decimal_to_binary(mut decimal: u32) -> String {
+fn decimal_to_binary(mut decimal: u128) -> String {
     let mut binary_string = String::new();
 
     if decimal == 0 {
@@ -69,7 +69,7 @@ fn main() {
                     }
                 };
                 
-                let number_int = match number_int.parse::<u32>(){
+                let number_int = match number_int.parse::<u128>(){
                     Ok(x) => x,
                     Err(_) => {
                         println!("\x1B[F\x1B[2K\x1B[F\x1B[2K\x1B[F");
