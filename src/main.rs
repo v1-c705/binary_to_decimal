@@ -102,7 +102,7 @@ fn main() {
 
                 let result = binary_to_decimal(number_str.to_string().as_str());
                 println!("\x1B[2K\x1B[F\x1B[2K\x1B[F\x1B[2K\x1B[F");
-                println!("{} ist gleich: {} in Binär", number_str.bright_green(), result.to_string().bright_green());
+                println!("{} ist gleich: {} in Decimal", number_str.bright_green(), result.to_string().bright_green());
                 println!("{}", "----------------------------------".bright_green());
             },
             _ => ()
