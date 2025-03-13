@@ -5,7 +5,6 @@ fn binary_to_decimal(binary: &str) -> u32 {
     let mut decimal_value = 0;
     let mut power = 0;
 
-    // Iterate over the binary string in reverse order
     for digit in binary.chars().rev() {
         let bit = digit.to_digit(2).expect("Invalid binary digit");
         decimal_value += bit * 2u32.pow(power);
@@ -36,60 +35,96 @@ fn main() {
         highlighted_option_prefix: Styled::new(">").with_fg(Color::LightGreen),
         prompt_prefix: Styled::new("").with_fg(Color::LightGreen),
         selected_option: Some(StyleSheet::new().with_fg(Color::LightGreen)),
+        answer: StyleSheet::new().with_fg(Color::DarkGrey),
         canceled_prompt_indicator: Styled::new(""),
+        help_message: StyleSheet::new().with_fg(Color::DarkGrey),
         ..RenderConfig::default()
     };
 
     loop{
-        let modules: Vec<&str> = vec!["Decimal > Binär", "Binär > Decimal"];
-        let module = Select::new("Was möchten Sie? :", modules)
+        let modules: Vec<&str> = vec!["Decimal nach Binär", "Binär nach Decimal"];
+        let module = Select::new("Was rechnen wir? :", modules)
             .with_render_config(module_style)
+            .with_help_message("↑↓ zum Bewegen")
             .prompt();
 
         let choice = match module{
             Ok(module) => module,
-            Err(_) => "None"
+            Err(_) => {
+                println!("\x1B[F\x1B[2K\x1B[F");
+                ""
+            }
         };
 
         match choice{
-            "Decimal > Binär" => {
-                let message = format!("Geben Sie {} -> ", "a₁".bright_blue());
+            "Decimal nach Binär" => {
+                let message = format!("Geben Sie Ihre Nummer in {}", "Decimal".bright_green());
                 let input = Text::new(&message)
                 .prompt();
                 let number_int = match input {
                     Ok(number) => number,
-                    Err(_) => String::from("None")
+                    Err(_) => {
+                        println!("\x1B[F\x1B[2K\x1B[F\x1B[2K\x1B[F");
+                        continue
+                    }
                 };
-                let result = decimal_to_binary(number_int.parse().unwrap());
-                println!("Ihre Nummer {} ist gleich: {} in Decimal", number_int.bright_green(), result.bright_blue())
+                
+                let number_int = match number_int.parse::<u32>(){
+                    Ok(x) => x,
+                    Err(_) => {
+                        println!("\x1B[F\x1B[2K\x1B[F\x1B[2K\x1B[F");
+                        continue
+                    }
+                };
+
+                let result = decimal_to_binary(number_int);
+                println!("\x1B[2K\x1B[F\x1B[2K\x1B[F\x1B[2K\x1B[F");
+                println!("{} ist gleich: {} in Binär", number_int.to_string().bright_green(), result.bright_green());
+                println!("{}", "----------------------------------".bright_green());
             },
-            "Binär > Decimal" => {
-                let message = format!("Geben Sie Ihre Nummer in {}", "Binär".bright_blue());
+            "Binär nach Decimal" => {
+                let message = format!("Geben Sie Ihre Nummer in {}", "Binär".bright_green());
                 let input = Text::new(&message)
                 .prompt();
+
                 let number_str = match input {
                     Ok(number) => number,
-                    Err(_) => String::from("None")
+                    Err(_) => {
+                        println!("\x1B[F\x1B[2K\x1B[F\x1B[2K\x1B[F");
+                        continue
+                    }
                 };
-                let result = binary_to_decimal(number_str.as_str());
-                println!("Ihre Nummer {} ist gleich: {} in Binär", number_str.bright_green(), result.to_string().bright_blue())
+
+                if number_str.chars().all(|c| c == '1' || c == '0') == false{
+                    println!("\x1B[F\x1B[2K\x1B[F\x1B[2K\x1B[F");
+                        continue
+                }
+
+                let result = binary_to_decimal(number_str.to_string().as_str());
+                println!("\x1B[2K\x1B[F\x1B[2K\x1B[F\x1B[2K\x1B[F");
+                println!("{} ist gleich: {} in Binär", number_str.bright_green(), result.to_string().bright_green());
+                println!("{}", "----------------------------------".bright_green());
             },
             _ => ()
         };
 
         let continue_options: Vec<&str> = vec!["Ja", "Nein (Schließ program)"];
-        let continue_handler = Select::new("Möchten Sie wieder rechnen? :", continue_options)
+        let continue_handler = Select::new("Möchten Sie weiterhin rechnen? :", continue_options)
             .with_render_config(module_style)
+            .with_help_message("↑↓ zum Bewegen")
             .prompt();
 
         let should_continue = match continue_handler{
-            Ok(i) => i,
-            Err(_) => "None"
+            Ok(x) => x,
+            Err(_) => ""
         };
 
         match should_continue{
-            "Ja" => continue,
-            "Nein (Schließ program)" => break,
+            "Ja" => {
+                println!("\x1B[F\x1B[2K\x1B[F");
+                continue
+            }
+            "Nein (Anwendung schließen)" => break,
             _ => break
         }
     }
